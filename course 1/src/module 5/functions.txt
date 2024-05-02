@@ -1,0 +1,8 @@
+
+- functions and scope
+- closures or anonymous functions - functions with no names
+- higher order functions - functions that take another functions as an argument
+- macros - meta or dynamic programming - allows to create custom functionality
+
+
+
