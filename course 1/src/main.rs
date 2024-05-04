@@ -1,35 +1,27 @@
-use std::fs::File;
+use std::{
+    sync::{Arc, Mutex},
+    thread,
+};
 
+// mutual execution lock
+// only one thread can access the data at any one time
 fn main() {
-    // unrecoverable error
-    // le: Vec<i32>t v = vec![1, 2, 3];
-    // v[10];
-    // panic!("Something went wrong cannot proceed");
+    let c = Arc::new(Mutex::new(0));
 
-    // recoverable
-    let f = File::open("main.jpg");
+    let mut threads = vec![];
 
-    match f {
-        Ok(f) => {
-            println!("file found {:?}", f);
-        }
-        Err(e) => {
-            println!("find not found {:?}", e);
-        }
+    for i in 0..10 {
+        let c = Arc::clone(&c);
+        let thread = thread::spawn(move || {
+            let mut num = c.lock().unwrap();
+            *num += 1;
+        });
+        threads.push(thread);
     }
 
-    divide(Some(1));
-    divide(Some(10));
-    divide(None);
-    // divide(Some(0));
-}
-
-const ANSWERE_TO_LIFE: i32 = 42;
-
-fn divide(x: Option<i32>) {
-    match x {
-        Some(0) => panic!("cannot be divided by zero"),
-        Some(x) => println!("answer to life is {}", ANSWERE_TO_LIFE / x),
-        None => println!("boooooo {}", ANSWERE_TO_LIFE),
+    for th in threads {
+        th.join().unwrap();
     }
+
+    println!("Result {}", *c.lock().unwrap());
 }
